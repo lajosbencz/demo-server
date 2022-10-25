@@ -53,7 +53,7 @@ func (t *App) RemoveResource(ns string) {
 
 func (t *App) ListNamespaces() []string {
 	a := []string{}
-	for k, _ := range t.resources {
+	for k := range t.resources {
 		a = append(a, k)
 	}
 	return a
