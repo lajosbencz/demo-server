@@ -27,19 +27,9 @@ func httpError(w http.ResponseWriter, err error) {
 }
 
 func httpSuccess(w http.ResponseWriter, payload interface{}) {
-	data := map[string]interface{}{
-		"error":   false,
-		"payload": payload,
-	}
-	if err := json.NewEncoder(w).Encode(data); err != nil {
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
 		httpError(w, err)
 	}
-}
-
-type AddResource struct {
-	Name      string      `json:"name"`
-	Value     interface{} `json:"value"`
-	Overwrite bool        `json:"overwrite"`
 }
 
 // From https://golang.org/src/net/http/server.go
