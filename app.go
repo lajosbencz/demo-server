@@ -68,6 +68,10 @@ func (t *App) Restore() error {
 	defer lock.Unlock()
 	file, err := os.OpenFile(path, os.O_RDONLY, 0664)
 	if err != nil {
+		if err == os.ErrNotExist {
+			log.Printf("app: no state to restore from %s\n", path)
+			return nil
+		}
 		return err
 	}
 	defer file.Close()
