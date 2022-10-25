@@ -70,6 +70,7 @@ func (t *App) Restore() error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 	if json.NewDecoder(file).Decode(&t.resources); err != nil {
 		return err
 	}
