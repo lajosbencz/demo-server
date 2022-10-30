@@ -1,5 +1,7 @@
 # demo-server
 
+## Run from binary
+
 ```bash
 ./demo-server -help
 
@@ -11,4 +13,10 @@ Usage of demo-server:
   -p int
         Port part of address to listen on (default 8080)
   -s    Enable HTTPS with self-signed certificate
+```
+
+## Run from container
+```bash
+docker build -t demo-server .
+docker run -v ${PWD}:/etc/demo-server -p 8080:8080 demo-server
 ```
