@@ -5,9 +5,9 @@
 ```bash
 ./demo-server -help
 
-Usage of demo-server:
+Usage of ./demo-server:
   -f string
-        Persist resource state to this file (default "persist.json")
+        Persist resource state to this file (leave empty to disable)
   -h string
         Host part of address to listen on (default "localhost")
   -p int
