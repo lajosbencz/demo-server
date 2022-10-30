@@ -162,6 +162,7 @@ func main() {
 			log.Println("ERR:", err.Error())
 		}
 		cancel()
+		log.Println("cleanup done")
 		// fin.
 	}()
 	// start closing connections
