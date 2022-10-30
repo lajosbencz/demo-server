@@ -10,30 +10,33 @@ import (
 	"github.com/juju/fslock"
 )
 
+// Namespace is an indentifier to which a Resource is assigned
+type Namespace = string
+
 // Resource is a dictionary stored under a namespace
-type Resource = map[string]interface{}
+type Resource = map[Namespace]interface{}
 
 // App is responsible for storing state in-memory and loading/saving it to persistent storage
 type App struct {
 	persistFilePath string
-	resources       map[string]Resource
+	resources       map[Namespace]Resource
 }
 
-// HasResource checks if a namespace already exists
-func (t *App) HasResource(ns string) bool {
+// HasResource checks if a Namespace already exists
+func (t *App) HasResource(ns Namespace) bool {
 	_, has := t.resources[ns]
 	return has
 }
 
-// SetResource creates or overwrites data under a namespace
-func (t *App) SetResource(ns string, data Resource) error {
+// SetResource creates or overwrites data under a Namespace
+func (t *App) SetResource(ns Namespace, data Resource) error {
 	t.resources[ns] = data
 	log.Printf("app: resource [%s] updated\n", ns)
 	return nil
 }
 
-// MergeResource recursively merges data under a namespace
-func (t *App) MergeResource(ns string, data Resource) error {
+// MergeResource recursively merges data under a Namespace
+func (t *App) MergeResource(ns Namespace, data Resource) error {
 	var payload Resource
 	if !t.HasResource(ns) {
 		payload = Resource{}
@@ -43,8 +46,8 @@ func (t *App) MergeResource(ns string, data Resource) error {
 	return t.SetResource(ns, MergeMaps(payload, data))
 }
 
-// GetResource returns the data under a namespace
-func (t *App) GetResource(ns string) (Resource, error) {
+// GetResource returns the data under a Namespace
+func (t *App) GetResource(ns Namespace) (Resource, error) {
 	if !t.HasResource(ns) {
 		return nil, fmt.Errorf("no such resource: [%s]", ns)
 	}
@@ -52,15 +55,15 @@ func (t *App) GetResource(ns string) (Resource, error) {
 	return t.resources[ns], nil
 }
 
-// RemoveResource deletes the data under a namespace
-func (t *App) RemoveResource(ns string) {
+// RemoveResource deletes the data under a Namespace
+func (t *App) RemoveResource(ns Namespace) {
 	delete(t.resources, ns)
 	log.Printf("app: resource [%s] removed\n", ns)
 }
 
-// ListNamespaces lists all the available namespaces
-func (t *App) ListNamespaces() []string {
-	a := []string{}
+// ListNamespaces lists all the available Namespaces
+func (t *App) ListNamespaces() []Namespace {
+	a := []Namespace{}
 	for k := range t.resources {
 		a = append(a, k)
 	}
@@ -123,6 +126,6 @@ func (t *App) Restore() error {
 func NewApp(persistFilePath string) *App {
 	return &App{
 		persistFilePath: persistFilePath,
-		resources:       map[string]Resource{},
+		resources:       map[Namespace]Resource{},
 	}
 }

@@ -56,7 +56,7 @@ func main() {
 	subRouter := router.PathPrefix("/")
 	subRouter.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		ns := r.URL.Path[1:]
+		var ns Namespace = r.URL.Path[1:]
 
 		if r.Method == http.MethodPut {
 			var payload Resource
