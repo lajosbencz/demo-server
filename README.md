@@ -17,6 +17,5 @@ Usage of ./demo-server:
 
 ## Run from container
 ```bash
-docker build -t demo-server .
 docker run -v ${PWD}:/etc/demo-server -p 8080:8080 ghcr.io/lajosbencz/demo-server:latest
 ```
