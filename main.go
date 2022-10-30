@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defPersistFile = "persist.json"
+	defPersistFile = ""
 	defHost        = "localhost"
 	defPort        = 8080
 	defSecure      = false
@@ -26,7 +26,7 @@ func main() {
 		secure      bool
 	)
 
-	flag.StringVar(&persistFile, "f", defPersistFile, "Persist resource state to this file")
+	flag.StringVar(&persistFile, "f", defPersistFile, "Persist resource state to this file (leave empty to disable)")
 	flag.StringVar(&host, "h", defHost, "Host part of address to listen on")
 	flag.IntVar(&port, "p", defPort, "Port part of address to listen on")
 	flag.BoolVar(&secure, "s", defSecure, "Enable HTTPS with self-signed certificate")

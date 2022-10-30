@@ -61,6 +61,9 @@ func (t *App) ListNamespaces() []string {
 
 func (t *App) Persist() error {
 	path := t.persistFilePath
+	if path == "" {
+		return nil
+	}
 	lock := fslock.New(path)
 	err := lock.TryLock()
 	if err != nil {
@@ -81,6 +84,9 @@ func (t *App) Persist() error {
 
 func (t *App) Restore() error {
 	path := t.persistFilePath
+	if path == "" {
+		return nil
+	}
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		log.Printf("app: no state to restore from %s\n", path)
 		return nil
