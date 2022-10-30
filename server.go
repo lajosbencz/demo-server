@@ -99,7 +99,7 @@ func NewServer(host string, port int, secure bool, handler http.Handler) (*Serve
 	}
 	var listener net.Listener
 	if secure {
-		listener = tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener), 3 * time.Minute}, tlsCfg)
+		listener = tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener), defKeepalive}, tlsCfg)
 	} else {
 		listener = ln
 	}

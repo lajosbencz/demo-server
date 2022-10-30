@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+const (
+	sscCommonName         = "localhost"
+	sscCountry            = "HU"
+	sscOrganization       = "lazos.me"
+	sscOrganizationalUnit = "dev"
+	sscExpiryDays         = 30
+)
+
 // GenX509KeyPair generates the TLS keypair for the server
 // see: https://gist.github.com/shivakar/cd52b5594d4912fbeb46
 func GenX509KeyPair() (tls.Certificate, error) {
@@ -17,13 +25,13 @@ func GenX509KeyPair() (tls.Certificate, error) {
 	template := &x509.Certificate{
 		SerialNumber: big.NewInt(now.Unix()),
 		Subject: pkix.Name{
-			CommonName:         "localhost",
-			Country:            []string{"HU"},
-			Organization:       []string{"lazos.me"},
-			OrganizationalUnit: []string{"dev"},
+			CommonName:         sscCommonName,
+			Country:            []string{sscCountry},
+			Organization:       []string{sscOrganization},
+			OrganizationalUnit: []string{sscOrganizationalUnit},
 		},
 		NotBefore:             now,
-		NotAfter:              now.AddDate(0, 0, 30),
+		NotAfter:              now.AddDate(0, 0, sscExpiryDays),
 		SubjectKeyId:          []byte{113, 117, 105, 99, 107, 115, 101, 114, 118, 101},
 		BasicConstraintsValid: true,
 		IsCA:                  true,

@@ -12,10 +12,12 @@ import (
 )
 
 const (
-	defPersistFile = ""
-	defHost        = "localhost"
-	defPort        = 8080
-	defSecure      = false
+	defKeepalive       = 3 * time.Minute
+	defShutdownTimeout = 5 * time.Second
+	defPersistFile     = ""
+	defHost            = "localhost"
+	defPort            = 8080
+	defSecure          = false
 )
 
 func main() {
@@ -154,8 +156,8 @@ func main() {
 	// wait for the server to start shutting down
 	srv.Wait()
 	log.Println("shutting server down...")
-	// grace period is 5 seconds
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// grace period for shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), defShutdownTimeout)
 	// cleanup tasks
 	defer func() {
 		if err := app.Persist(); err != nil {
