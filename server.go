@@ -39,6 +39,7 @@ func httpSuccess(w http.ResponseWriter, payload interface{}) {
 // go away.
 type tcpKeepAliveListener struct {
 	*net.TCPListener
+	period time.Duration
 }
 
 // Accept TCP connection and set up keepalive
@@ -48,7 +49,7 @@ func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 		return
 	}
 	tc.SetKeepAlive(true)
-	tc.SetKeepAlivePeriod(3 * time.Minute)
+	tc.SetKeepAlivePeriod(ln.period)
 	return tc, nil
 }
 
@@ -98,7 +99,7 @@ func NewServer(host string, port int, secure bool, handler http.Handler) (*Serve
 	}
 	var listener net.Listener
 	if secure {
-		listener = tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener)}, tlsCfg)
+		listener = tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener), 3 * time.Minute}, tlsCfg)
 	} else {
 		listener = ln
 	}
