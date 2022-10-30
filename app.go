@@ -10,24 +10,29 @@ import (
 	"github.com/juju/fslock"
 )
 
+// Resource is a dictionary stored under a namespace
 type Resource = map[string]interface{}
 
+// App is responsible for storing state in-memory and loading/saving it to persistent storage
 type App struct {
 	persistFilePath string
 	resources       map[string]Resource
 }
 
+// HasResource checks if a namespace already exists
 func (t *App) HasResource(ns string) bool {
 	_, has := t.resources[ns]
 	return has
 }
 
+// SetResource creates or overwrites data under a namespace
 func (t *App) SetResource(ns string, data Resource) error {
 	t.resources[ns] = data
 	log.Printf("app: resource [%s] updated\n", ns)
 	return nil
 }
 
+// MergeResource recursively merges data under a namespace
 func (t *App) MergeResource(ns string, data Resource) error {
 	var payload Resource
 	if !t.HasResource(ns) {
@@ -38,6 +43,7 @@ func (t *App) MergeResource(ns string, data Resource) error {
 	return t.SetResource(ns, MergeMaps(payload, data))
 }
 
+// GetResource returns the data under a namespace
 func (t *App) GetResource(ns string) (Resource, error) {
 	if !t.HasResource(ns) {
 		return nil, fmt.Errorf("no such resource: [%s]", ns)
@@ -46,11 +52,13 @@ func (t *App) GetResource(ns string) (Resource, error) {
 	return t.resources[ns], nil
 }
 
+// RemoveResource deletes the data under a namespace
 func (t *App) RemoveResource(ns string) {
 	delete(t.resources, ns)
 	log.Printf("app: resource [%s] removed\n", ns)
 }
 
+// ListNamespaces lists all the available namespaces
 func (t *App) ListNamespaces() []string {
 	a := []string{}
 	for k := range t.resources {
@@ -59,6 +67,7 @@ func (t *App) ListNamespaces() []string {
 	return a
 }
 
+// Persist saves the state of the application to disk
 func (t *App) Persist() error {
 	path := t.persistFilePath
 	if path == "" {
@@ -82,6 +91,7 @@ func (t *App) Persist() error {
 	return nil
 }
 
+// Restore restores the state of the application from disk
 func (t *App) Restore() error {
 	path := t.persistFilePath
 	if path == "" {
@@ -109,6 +119,7 @@ func (t *App) Restore() error {
 	return nil
 }
 
+// NewApp creates a new App using the specified file path to persists state to
 func NewApp(persistFilePath string) *App {
 	return &App{
 		persistFilePath: persistFilePath,
