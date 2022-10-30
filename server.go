@@ -11,8 +11,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/phayes/freeport"
 )
 
 func httpError(w http.ResponseWriter, err error) {
@@ -67,14 +65,6 @@ func (t *Server) Serve() {
 
 func (t *Server) Wait() {
 	<-t.DoneCh
-}
-
-func NewDefaultServer(handler http.Handler) (*Server, error) {
-	port, err := freeport.GetFreePort()
-	if err != nil {
-		return nil, err
-	}
-	return NewServer("localhost", port, true, handler)
 }
 
 func NewServer(host string, port int, secure bool, handler http.Handler) (*Server, error) {
