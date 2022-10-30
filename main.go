@@ -26,24 +26,29 @@ func main() {
 		secure      bool
 	)
 
+	// parse cli arguments
 	flag.StringVar(&persistFile, "f", defPersistFile, "Persist resource state to this file (leave empty to disable)")
 	flag.StringVar(&host, "h", defHost, "Host part of address to listen on")
 	flag.IntVar(&port, "p", defPort, "Port part of address to listen on")
 	flag.BoolVar(&secure, "s", defSecure, "Enable HTTPS with self-signed certificate")
 	flag.Parse()
 
+	// create App instance
 	app := NewApp(persistFile)
 	if err := app.Restore(); err != nil {
 		panic(err)
 	}
 
+	// create HTTP router
 	router := mux.NewRouter()
 
+	// create Server instance
 	srv, err := NewServer(host, port, secure, router)
 	if err != nil {
 		panic(err)
 	}
 
+	// setup route for /
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		if r.Method == http.MethodGet {
@@ -53,11 +58,13 @@ func main() {
 		w.WriteHeader(404)
 	})
 
+	// setup catch-all route for namespaced resources
 	subRouter := router.PathPrefix("/")
 	subRouter.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		var ns Namespace = r.URL.Path[1:]
 
+		// PUT: create/overwrite Resource
 		if r.Method == http.MethodPut {
 			var payload Resource
 			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
@@ -82,6 +89,7 @@ func main() {
 			return
 		}
 
+		// GET: return Resource
 		if r.Method == http.MethodGet {
 			if !app.HasResource(ns) {
 				w.WriteHeader(404)
@@ -95,6 +103,7 @@ func main() {
 			return
 		}
 
+		// POST: update Resource
 		if r.Method == http.MethodPost {
 			resp := Resource{
 				"updated":   false,
@@ -118,6 +127,7 @@ func main() {
 			return
 		}
 
+		// DELETE: remove Resource
 		if r.Method == http.MethodDelete {
 			resp := Resource{
 				"deleted":   false,
@@ -134,21 +144,27 @@ func main() {
 		}
 	})
 
+	// start the Server
 	srv.Serve()
 	proto := "http"
 	if secure {
 		proto = "https"
 	}
 	log.Printf("server listening on %s://%s\n", proto, srv.Server.Addr)
+	// wait for the server to start shutting down
 	srv.Wait()
 	log.Println("shutting server down...")
+	// grace period is 5 seconds
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// cleanup tasks
 	defer func() {
 		if err := app.Persist(); err != nil {
 			log.Println("ERR:", err.Error())
 		}
 		cancel()
+		// fin.
 	}()
+	// start closing connections
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("server shutdown failed: %+v", err)
 	}
