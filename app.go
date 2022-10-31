@@ -13,8 +13,8 @@ import (
 // Namespace is an indentifier to which a Resource is assigned
 type Namespace = string
 
-// Resource is a dictionary stored under a namespace
-type Resource = map[Namespace]interface{}
+// Resource is a generic dictionary stored under a Namespace
+type Resource = map[string]interface{}
 
 // App is responsible for storing state in-memory and loading/saving it to persistent storage
 type App struct {
